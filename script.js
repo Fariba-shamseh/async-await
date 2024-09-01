@@ -39,23 +39,29 @@ const getPosition = function () {
 const key = '908799934974028841283x8131';
 //Geolocation
 const whereAmI = async function (country) {
-  const pos = await getPosition();
-  const { latitude: lat, longitude: lng } = pos.coords;
+  try {
+    const pos = await getPosition();
+    const { latitude: lat, longitude: lng } = pos.coords;
 
-  //reverse geocoding
-  const resGeo = await fetch(
-    `https://geocode.xyz/${lat},${lng}?json=1=xml&auth=${key}`
-  );
-  const dataGeo = await resGeo.json();
-  console.log(dataGeo);
+    //reverse geocoding
+    const resGeo = await fetch(
+      `https://geocode.xyz/${lat},${lng}?json=1=xml&auth=${key}`
+    );
+    if (!resGeo.ok) throw new Error('problem getting country');
+    const dataGeo = await resGeo.json();
+    console.log(dataGeo);
 
-  //country data
-  const res = await fetch(
-    `https://restcountries.com/v3.1/name/${dataGeo.country}`
-  );
-  const data = await res.json();
-  console.log(data);
-  renderCountry(data[0]);
+    //country data
+    const res = await fetch(
+      `https://restcountries.com/v3.1/name/${dataGeo.country}`
+    );
+    if (!res.ok) throw new Error('problem getting country');
+    const data = await res.json();
+    console.log(data);
+    renderCountry(data[0]);
+  } catch (err) {
+    console.error(err);
+  }
 };
 whereAmI('germany');
 console.log('first');
